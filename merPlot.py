@@ -607,21 +607,7 @@ def visualize(chart, draw_windows=False):
 	return img
 
 
-def generate_image(content):
-	img = visualize(draw(*parse_mer(content)), draw_windows=False)
-	buffer = io.BytesIO()
-	img.save(buffer, format='PNG')
-	base64_img = base64.b64encode(buffer.getvalue()).decode()
-	return f"data:image/png;base64,{base64_img}"
-
-
-def read_complete(event):
-	# event is ProgressEvent
-	content = document.getElementById("outputImage");
-	content.src = event.target.result
-
-
-async def process_file(x):
+def button_clicked():
 	fileList = document.getElementById('fileInput').files
 	for f in fileList:
 		# reader is a pyodide.JsProxy
@@ -631,16 +617,17 @@ async def process_file(x):
 		# console.log("done")
 		reader.onload = onload_event
 		reader.readAsText(f)
-	return
 
+function_proxy = create_proxy(button_clicked)
+e = document.getElementById("button")
+e.addEventListener("click", function_proxy)
+document.getElementById("button").addEventListener("click", function_proxy)
 
-def main():
-	# Create a Python proxy for the callback function
-	file_event = create_proxy(process_file)
-
-	# Set the listener to the callback
-	e = document.getElementById("upload")
-	e.addEventListener("change", file_event, False)
-
-
-main()
+def read_complete(event):
+	# event is ProgressEvent
+	content = document.getElementById("outputImage");
+	img = visualize(draw(*parse_mer(event.target.result)), draw_windows=False)
+	buffer = io.BytesIO()
+	img.save(buffer, format='PNG')
+	base64_img = base64.b64encode(buffer.getvalue()).decode()
+	content.src = base64_img
