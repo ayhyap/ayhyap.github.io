@@ -406,13 +406,16 @@ def draw(notes: list, holds: dict):
 	notes = np.array(notes, dtype="object")
 	note_indices = np.array([note.index for note in notes])
 	arange = np.arange(len(note_indices))
+	print('plotting notes')
 	for note in notes:
 		if note.note_type != NOTE_TYPE_HOLD_END:
 			plot_note(note)
 
+	print('plotting holds')
 	for hold in holds.values():
 		prev_note = None
 		for note in hold.notes:
+			print(note)
 			if prev_note is None:
 				plot_note(note)
 				prev_note = note
