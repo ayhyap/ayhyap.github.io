@@ -1,45 +1,55 @@
 <!DOCTYPE html>
-<html>
-<head>
-    <script type="module" src="https://pyscript.net/releases/2025.5.1/core.js"></script>
-</head>
-<body>
-    <h2>Upload File & Generate Image</h2>
-    <input type="file" id="fileInput">
-    <button onclick="processFile()">Generate Image</button>
-    <img id="outputImage">
-    <py-config>
-    {
-        "packages": ["pillow"]
-    }
-    </py-config>
-    <py-script>
-        import io
-        import base64
-        from PIL import Image
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>File System Examples</title>
+    <link rel="stylesheet" href="https://pyscript.net/alpha/pyscript.css" />
+    <script defer src="https://pyscript.net/alpha/pyscript.js"></script>
+  </head>
+  <body>
+    <p>This example shows how to read a file from the local file system and display its contents</p>
+    <br />
+    <p>Warning: Not every file type will display. PyScript removes content with tags such as XML, HTML, PHP, etc. Normal text files will work.</p>
+    <br />
+    <p>No content type checking is performed to detect images, executables, etc.</p>
+    <br />
+    <label for="myfile">Select a file:</label>
+    <input type="file" id="myfile" name="myfile">
+    <br />
+    <br />
+    <div id="print_output"></div>
+    <br />
+    <p>File Content:</p>
+    <div style="border:2px inset #AAA;cursor:text;height:120px;overflow:auto;width:600px; resize:both">
+      <div id="content">
+      </div>
+    </div>
 
-        def generate_image(content):
-            img = Image.open(io.BytesIO(content))  # Open file
-            img = img.convert("L")  # Example processing
-            buffer = io.BytesIO()
-            img.save(buffer, format="PNG")
-            base64_img = base64.b64encode(buffer.getvalue()).decode()
-            return f"data:image/png;base64,{base64_img}"
-    </py-script>
+    <py-script output="print_output">
+        import asyncio
+        from js import document, FileReader
+        from pyodide import create_proxy
 
-    <script>
-        async function processFile() {
-            let file = document.getElementById("fileInput").files[0];
-            let reader = new FileReader();
+        async def process_file(event):
+            fileList = event.target.files.to_py()
 
-            reader.onload = async function(event) {
-                let content = event.target.result;
-                let base64Img = await pyscript.run('generate_image', { content: new Uint8Array(content) });
-                document.getElementById("outputImage").src = base64Img;
-            };
+            for f in fileList:
+                data = await f.text()
+                document.getElementById("content").innerHTML = data
 
-            reader.readAsArrayBuffer(file);
-        }
-    </script>
+        def main():
+            # Create a Python proxy for the callback function
+            # process_file() is your function to process events from FileReader
+            file_event = create_proxy(process_file)
+
+            # Set the listener to the callback
+            e = document.getElementById("myfile")
+            e.addEventListener("change", file_event, False)
+
+        main()
+        </py-script>
+
 </body>
 </html>
