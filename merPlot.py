@@ -4,7 +4,6 @@ from PIL import Image, ImageDraw
 import io
 import base64
 
-import asyncio
 import js
 from js import document, FileReader
 from pprint import pprint
