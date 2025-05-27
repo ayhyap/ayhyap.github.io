@@ -8,12 +8,14 @@
 <body>
     <h2>Upload file & Generate Image</h2>
     <input type="file" id="fileInput">
+    <p>
+        Select a .mer file to plot.
+    </p>
     <button id="button" py-click="button_clicked">Generate Image</button>
+    <br>
     <img id="outputImage">
 
     <script type="py" src="./merPlot.py" config="./pyscript.toml"></script>
-    <br>
-    <div id="content"></div>
 
 </body>
 </html>
