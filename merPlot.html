@@ -6,11 +6,14 @@
     <title>merPlot - WACCA chart visualizer</title>
 </head>
 <body>
-    <h2>Upload File & Generate Image</h2>
+    <h2>Upload .mer & Generate Image</h2>
     <input type="file" id="fileInput">
     <button onclick="processFile()">Generate Image</button>
     <img id="outputImage">
-    <script type="py" src="./merPlot.py" config="./pyscript.toml"></script>
+    <py-config type="toml">
+        packages = ["numpy", "pillow"]
+    </py-config>
+    <script type="py" src="./merPlot.py"></script>
     <script>
         async function processFile() {
             let file = document.getElementById("fileInput").files[0];
