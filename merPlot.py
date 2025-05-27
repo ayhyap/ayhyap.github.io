@@ -608,7 +608,7 @@ def visualize(chart, draw_windows=False):
 	return img
 
 
-def button_clicked():
+def button_clicked(*args, **kwargs):
 	fileList = document.getElementById('fileInput').files
 	for f in fileList:
 		# reader is a pyodide.JsProxy
@@ -618,11 +618,6 @@ def button_clicked():
 		# console.log("done")
 		reader.onload = onload_event
 		reader.readAsText(f)
-
-function_proxy = create_proxy(button_clicked)
-e = document.getElementById("button")
-e.addEventListener("click", function_proxy)
-document.getElementById("button").addEventListener("click", function_proxy)
 
 def read_complete(event):
 	# event is ProgressEvent
