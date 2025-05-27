@@ -7,7 +7,7 @@ import base64
 import asyncio
 import js
 from js import document, FileReader
-from pprint import pprint
+# from pprint import pprint
 from pyodide.ffi import create_proxy
 
 
