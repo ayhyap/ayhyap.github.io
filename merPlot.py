@@ -7,7 +7,7 @@ import base64
 import asyncio
 import js
 from js import document, FileReader
-# from pprint import pprint
+from pprint import pprint
 from pyodide.ffi import create_proxy
 
 
@@ -250,8 +250,8 @@ def parse_mer(lines):
 		try:
 			measure = int(split[0])
 		except Exception as e:
-			print(line)
-			print(split)
+			pprint(line)
+			pprint(split)
 			raise e
 		end_measure = max(end_measure, measure)
 		tick = int(split[1])
