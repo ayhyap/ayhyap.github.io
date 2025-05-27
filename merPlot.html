@@ -4,31 +4,18 @@
     <meta charset="UTF-8">
       <script type="module" src="https://pyscript.net/releases/2025.5.1/core.js"></script>
     <title>merPlot - WACCA chart visualizer</title>
+    <py-config type="toml">
+        packages = ["numpy", "pillow"]
+    </py-config>
 </head>
 <body>
     <h2>Upload .mer & Generate Image</h2>
     <input type="file" id="fileInput">
     <button onclick="processFile()">Generate Image</button>
     <img id="outputImage">
-    <py-config type="toml">
-        packages = ["numpy", "pillow"]
-    </py-config>
+
     <script type="py" src="./merPlot.py"></script>
-    <script>
-        async function processFile() {
-            let file = document.getElementById("fileInput").files[0];
-            let reader = new FileReader();
-
-            reader.onload = async function(event) {
-                let textContent = event.target.result;  // Read text instead of binary
-                let base64Img = await pyscript.run('generate_image', { text: textContent });
-                document.getElementById("outputImage").src = base64Img;
-            };
-
-            reader.readAsText(file);
-        }
-    </script>
-
+    <p id="content"></p>
 
 </body>
 </html>
