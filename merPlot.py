@@ -622,9 +622,11 @@ def button_clicked(_):
 
 def read_complete(event):
 	# event is ProgressEvent
-	content = document.getElementById("outputImage");
-	img = visualize(draw(*parse_mer(event.target.result)), draw_windows=False)
-	buffer = io.BytesIO()
-	img.save(buffer, format='PNG')
-	base64_img = base64.b64encode(buffer.getvalue()).decode()
-	content.src = base64_img
+	# content = document.getElementById("outputImage");
+	# img = visualize(draw(*parse_mer(event.target.result)), draw_windows=False)
+	# buffer = io.BytesIO()
+	# img.save(buffer, format='PNG')
+	# base64_img = base64.b64encode(buffer.getvalue()).decode()
+	# content.src = base64_img
+	content = document.getElementById("content");
+	content.innerText = event.target.result
