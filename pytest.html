@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script defer src="https://pyscript.net/latest/pyscript.js"></script>
+</head>
+<body>
+    <h2>Upload File & Generate Image</h2>
+    <input type="file" id="fileInput">
+    <button onclick="processFile()">Generate Image</button>
+    <img id="outputImage">
+
+    <py-script>
+        import io
+        import base64
+        from PIL import Image
+
+        def generate_image(content):
+            img = Image.open(io.BytesIO(content))  # Open file
+            img = img.convert("L")  # Example processing
+            buffer = io.BytesIO()
+            img.save(buffer, format="PNG")
+            base64_img = base64.b64encode(buffer.getvalue()).decode()
+            return f"data:image/png;base64,{base64_img}"
+    </py-script>
+
+    <script>
+        async function processFile() {
+            let file = document.getElementById("fileInput").files[0];
+            let reader = new FileReader();
+
+            reader.onload = async function(event) {
+                let content = event.target.result;
+                let base64Img = await pyscript.run('generate_image', { content: new Uint8Array(content) });
+                document.getElementById("outputImage").src = base64Img;
+            };
+
+            reader.readAsArrayBuffer(file);
+        }
+    </script>
+</body>
+</html>
