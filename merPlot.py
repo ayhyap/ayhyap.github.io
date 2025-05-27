@@ -230,9 +230,7 @@ class Conductor:
 
 
 def parse_mer(lines):
-	pprint(lines)
 	lines = lines.split('\n')
-	pprint(lines)
 	is_body = False
 	starting_bpm = None
 	starting_timesig = None
@@ -242,6 +240,7 @@ def parse_mer(lines):
 	note_lines = []
 	_note_timestamps = []
 	for line in lines:
+		line = line.strip()
 		if line.startswith('#BODY'):
 			is_body = True
 			continue
