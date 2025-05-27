@@ -619,6 +619,7 @@ def button_clicked(*args, **kwargs):
 		reader.onload = onload_event
 		reader.readAsText(f)
 
+
 def read_complete(event):
 	# event is ProgressEvent
 	content = document.getElementById("outputImage");
