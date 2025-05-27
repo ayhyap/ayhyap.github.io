@@ -8,9 +8,12 @@
     <input type="file" id="fileInput">
     <button onclick="processFile()">Generate Image</button>
     <img id="outputImage">
-
+    <py-config>
+    {
+        "packages": ["pillow"]
+    }
+    </py-config>
     <py-script>
-        await micropip.install("pillow")
         import io
         import base64
         from PIL import Image
