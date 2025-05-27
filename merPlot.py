@@ -7,6 +7,7 @@ import base64
 import asyncio
 import js
 from js import document, FileReader
+
 from pyodide.ffi import create_proxy
 
 notetype2channel = {
