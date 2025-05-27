@@ -507,20 +507,16 @@ def button_clicked(event):
 	print('button_clicked')
 	fileList = document.getElementById('fileInput').files
 	for f in fileList:
-		# reader is a pyodide.JsProxy
 		reader = FileReader.new()
-		# Create a Python proxy for the callback function
 		onload_event = create_proxy(read_complete)
-		# console.log("done")
 		reader.onload = onload_event
 		reader.readAsText(f)
 
 def read_complete(event):
-	content = document.getElementById("outputImage");
+	content = document.getElementById("outputImage")
 	img = visualize(draw(*parse_mer(event.target.result)), draw_windows=False)
 	buffer = io.BytesIO()
 	img.save(buffer, format='PNG')
-	base64_img = base64.b64encode(buffer.getvalue()).decode()
-	content.src = base64_img
-	# content = document.getElementById("content")
-	# content.innerText = event.target.result
+	buffer.seek(0)
+	img_base64 = base64.b64encode(buffer.read()).decode()
+	document.getElementById("outputImage").src = f"data:image/png;base64,{img_base64}"
