@@ -1,1 +1,1 @@
-packages = ["pillow"]
+packages = ["pillow", "arrr"]
