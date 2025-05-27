@@ -622,7 +622,6 @@ def button_clicked(event):
 		reader.onload = onload_event
 		reader.readAsText(f)
 
-
 def read_complete(event):
 	content = document.getElementById("outputImage");
 	img = visualize(draw(*parse_mer(event.target.result)), draw_windows=False)
