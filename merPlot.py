@@ -409,62 +409,6 @@ def draw(notes: list, holds: dict):
 	for note in notes:
 		if note.note_type != NOTE_TYPE_HOLD_END:
 			plot_note(note)
-		# plot timing windows
-		if note.note_type in [NOTE_TYPE_HOLD_SEGMENT, NOTE_TYPE_HOLD_END] or note.channel in [CHANNEL_HOLD,
-																							  CHANNEL_HOLD_OVERLAPPING]:
-			# hold notes don't have timing windows aside from start
-			continue
-		else:
-			assert note.note_type is not None
-			timing_window = TIMING_WINDOWS[note.channel]
-
-			## handle early window
-			# check if on hold end
-			same_index_mask = note_indices == note.index
-			same_index_candidate_notes = notes[same_index_mask]
-			overlapping_hold_ends = [candidate_note for candidate_note in same_index_candidate_notes if
-									 check_overlap(note,
-												   candidate_note) and candidate_note.note_type == NOTE_TYPE_HOLD_END]
-			on_hold_end = len(overlapping_hold_ends) > 0
-			early_window_size = timing_window[1 if on_hold_end else 0]
-			early_index_mask = (note_indices >= note.index - early_window_size) & (note_indices < note.index)
-			early_candidate_notes = notes[early_index_mask]
-			early_overlapping_notes = [candidate_note for candidate_note in early_candidate_notes if
-									   check_overlap(note, candidate_note)]
-			if len(early_overlapping_notes) == 0:
-				start_index = note.index - timing_window[0]
-			else:
-				start_index = int((note.index + early_overlapping_notes[-1].index) / 2)
-			if on_hold_end:
-				start_index = max(start_index, note.index - timing_window[1])
-
-			# draw unsafe early window
-			# if start_index > safe window border, this loop is skipped
-			for index in np.arange(start_index, note.index - timing_window[1]):
-				plot_note(Note(note.position, note.size, channel=timing_window[-1], index=index))
-
-			# draw safe early window
-			for index in np.arange(max(start_index, note.index - timing_window[1]), note.index):
-				plot_note(Note(note.position, note.size, channel=timing_window[-2], index=index))
-
-			## handle late window
-			late_window_size = timing_window[3]
-			late_index_mask = (note_indices <= note.index + late_window_size) & (note_indices > note.index)
-			late_candidate_notes = notes[late_index_mask]
-			late_overlapping_notes = [candidate_note for candidate_note in late_candidate_notes if
-									  check_overlap(note, candidate_note)]
-			if len(late_overlapping_notes) == 0:
-				end_index = note.index + timing_window[3]
-			else:
-				end_index = int((note.index + late_overlapping_notes[0].index) / 2)
-
-			# draw safe late window
-			for index in np.arange(note.index, min(note.index + timing_window[2], end_index) + 1):
-				plot_note(Note(note.position, note.size, channel=timing_window[-2], index=index))
-
-			# draw unsafe late window
-			for index in np.arange(note.index + timing_window[2] + 1, end_index + 1):
-				plot_note(Note(note.position, note.size, channel=timing_window[-1], index=index))
 
 	for hold in holds.values():
 		prev_note = None
@@ -514,32 +458,7 @@ def visualize(chart, draw_windows=False):
 	img += chart[CHANNEL_HOLD_OVERLAPPING] * 64
 
 	if draw_windows:
-		# safe window
-		temp = np.zeros((chart.shape[1], chart.shape[2], 3), dtype=np.uint8)
-		for channel in SAFE_WINDOW_CHANNELS:
-			temp += chart[channel]
-		temp = np.clip(temp, 0, 1)
-		mask = temp * 0.5
-		mask[mask == 0] = 1
-		img = img * mask
-		temp[:, :, 0] *= 128
-		temp[:, :, 1] *= 27
-		temp[:, :, 2] *= 60
-		img += temp
-
-		# unsafe window
-		temp = np.zeros((chart.shape[1], chart.shape[2], 3), dtype=np.uint8)
-		for channel in UNSAFE_WINDOW_CHANNELS:
-			temp += chart[channel]
-		temp = np.clip(temp, 0, 1)
-		mask = temp * 0.5
-		mask[mask == 0] = 1
-		img = img * mask
-		temp[:, :, 0] *= 40
-		temp[:, :, 1] *= 88
-		temp[:, :, 2] *= 128
-		img += temp
-		img = img.astype(np.uint8)
+		raise NotImplementedError('timing windows not implemented for visualizer')
 
 	# guide lines
 	img[:, 0] += 48
