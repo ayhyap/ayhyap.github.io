@@ -247,12 +247,8 @@ def parse_mer(lines):
 		if not is_body:
 			continue
 		split = re.split(r'\s+', line.strip())
-		try:
-			measure = int(split[0])
-		except Exception as e:
-			pprint(line)
-			pprint(split)
-			raise e
+		if len(split) < 3:
+			continue
 		end_measure = max(end_measure, measure)
 		tick = int(split[1])
 		line_type = int(split[2])
