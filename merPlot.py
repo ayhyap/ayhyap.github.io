@@ -249,6 +249,7 @@ def parse_mer(lines):
 		split = re.split(r'\s+', line.strip())
 		if len(split) < 3:
 			continue
+		measure = int(split[0])
 		end_measure = max(end_measure, measure)
 		tick = int(split[1])
 		line_type = int(split[2])
