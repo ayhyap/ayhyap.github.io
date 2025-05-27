@@ -1,55 +1,18 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
   <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>File System Examples</title>
-    <link rel="stylesheet" href="https://pyscript.net/releases/2025.5.1/core.css">
-    <script type="module" src="https://pyscript.net/releases/2025.5.1/core.js"></script>
+      <meta charset="utf-8" />
+      <meta name="viewport" content="width=device-width,initial-scale=1" />
+      <title>🦜 Polyglot - Piratical PyScript</title>
+      <link rel="stylesheet" href="https://pyscript.net/releases/2025.5.1/core.css">
+      <script type="module" src="https://pyscript.net/releases/2025.5.1/core.js"></script>
   </head>
   <body>
-    <p>This example shows how to read a file from the local file system and display its contents</p>
-    <br />
-    <p>Warning: Not every file type will display. PyScript removes content with tags such as XML, HTML, PHP, etc. Normal text files will work.</p>
-    <br />
-    <p>No content type checking is performed to detect images, executables, etc.</p>
-    <br />
-    <label for="myfile">Select a file:</label>
-    <input type="file" id="myfile" name="myfile">
-    <br />
-    <br />
-    <div id="print_output"></div>
-    <br />
-    <p>File Content:</p>
-    <div style="border:2px inset #AAA;cursor:text;height:120px;overflow:auto;width:600px; resize:both">
-      <div id="content">
-      </div>
-    </div>
-
-    <py-script output="print_output">
-        import asyncio
-        from js import document, FileReader
-        from pyodide import create_proxy
-
-        async def process_file(event):
-            fileList = event.target.files.to_py()
-
-            for f in fileList:
-                data = await f.text()
-                document.getElementById("content").innerHTML = data
-
-        def main():
-            # Create a Python proxy for the callback function
-            # process_file() is your function to process events from FileReader
-            file_event = create_proxy(process_file)
-
-            # Set the listener to the callback
-            e = document.getElementById("myfile")
-            e.addEventListener("change", file_event, False)
-
-        main()
-        </py-script>
-
-</body>
+    <h1>Polyglot 🦜 💬 🇬🇧 ➡️ 🏴‍☠️</h1>
+    <p>Translate English into Pirate speak...</p>
+    <input type="text" id="english" placeholder="Type English here..." />
+    <button py-click="translate_english">Translate</button>
+    <div id="output"></div>
+    <script type="py" src="./main.py" config="./pyscript.json"></script>
+  </body>
 </html>
