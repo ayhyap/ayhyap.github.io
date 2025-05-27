@@ -7,7 +7,7 @@ import base64
 import asyncio
 import js
 from js import document, FileReader
-
+from pprint import pprint
 from pyodide.ffi import create_proxy
 
 notetype2channel = {
@@ -229,7 +229,9 @@ class Conductor:
 
 
 def parse_mer(lines):
-	linse = lines.split('\n')
+	pprint(lines)
+	lines = lines.split('\n')
+	pprint(lines)
 	is_body = False
 	starting_bpm = None
 	starting_timesig = None
