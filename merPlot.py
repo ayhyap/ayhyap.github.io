@@ -608,7 +608,7 @@ def visualize(chart, draw_windows=False):
 	return img
 
 
-async def button_clicked(_):
+def button_clicked(event):
 	print('button_clicked')
 	fileList = document.getElementById('fileInput').files
 	for f in fileList:
