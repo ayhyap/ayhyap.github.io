@@ -421,10 +421,14 @@ def draw(notes: list, holds: dict):
 				prev_note = note
 			else:
 				# interpolate hold
+				print('interpolate hold')
 				if prev_note.index == note.index:
+					print('same index, skipped')
 					continue
 				indices = np.arange(prev_note.index, note.index)
+				print('index', indices)
 				if len(indices) < 2:
+					print('too fast, skipped')
 					# hold moves too fast, no need to interpolate this segment
 					continue
 
@@ -432,11 +436,14 @@ def draw(notes: list, holds: dict):
 				# just assume it's baked idk
 				interpolated_sizes = [prev_note.size for _ in indices]
 				interpolated_positions = [prev_note.position for _ in indices]
-
+				print(interpolated_sizes)
+				print(interpolated_positions)
+				print('draw straight hold segments')
 				for i, (position, size, index) in enumerate(zip(interpolated_positions, interpolated_sizes, indices)):
 					# skip first one, already drawn
 					if i == 0:
 						continue
+					print(i, position, size, index)
 					plot_note(Note(position, size, note_type=NOTE_TYPE_HOLD_SEGMENT, index=index))
 				prev_note = note
 	# overlapping taps/hold starts
