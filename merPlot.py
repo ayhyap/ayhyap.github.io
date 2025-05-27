@@ -608,7 +608,7 @@ def visualize(chart, draw_windows=False):
 	return img
 
 
-def button_clicked(*args, **kwargs):
+def button_clicked(_):
 	fileList = document.getElementById('fileInput').files
 	for f in fileList:
 		# reader is a pyodide.JsProxy
