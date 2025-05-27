@@ -9,7 +9,6 @@ from js import document, FileReader
 from pprint import pprint
 from pyodide.ffi import create_proxy
 
-
 notetype2channel = {
 	0: None,
 	1: 0,  # tap
@@ -62,12 +61,6 @@ CHANNEL_WINDOW_SNAP_BACKWARD_UNSAFE = 17
 CHANNEL_WINDOW_SWIPE_CW_UNSAFE = 18
 CHANNEL_WINDOW_SWIPE_CCW_UNSAFE = 19
 CHANNEL_VERTICAL_INDICATOR = 20
-
-SAFE_WINDOW_CHANNELS = [CHANNEL_WINDOW_TAP_SAFE, CHANNEL_WINDOW_SNAP_FORWARD_SAFE, CHANNEL_WINDOW_SNAP_BACKWARD_SAFE,
-						CHANNEL_WINDOW_SWIPE_CW_SAFE, CHANNEL_WINDOW_SWIPE_CCW_SAFE, CHANNEL_WINDOW_CHAIN_SAFE]
-UNSAFE_WINDOW_CHANNELS = [CHANNEL_WINDOW_TAP_UNSAFE, CHANNEL_WINDOW_SNAP_FORWARD_UNSAFE,
-						  CHANNEL_WINDOW_SNAP_BACKWARD_UNSAFE, CHANNEL_WINDOW_SWIPE_CW_UNSAFE,
-						  CHANNEL_WINDOW_SWIPE_CCW_UNSAFE]
 
 LINE_TYPE_NOTE = 1
 LINE_TYPE_BPM = 2
@@ -425,9 +418,6 @@ def draw(notes: list, holds: dict):
 	# overlapping holds
 	chart[CHANNEL_HOLD_OVERLAPPING] = (chart[CHANNEL_HOLD] > 1).astype(np.int32)
 	chart[CHANNEL_HOLD] = chart[CHANNEL_HOLD].astype(bool).astype(np.int32)
-
-	for channel in SAFE_WINDOW_CHANNELS + UNSAFE_WINDOW_CHANNELS:
-		chart[channel] = chart[channel].astype(bool).astype(np.int32)
 
 	return chart
 
