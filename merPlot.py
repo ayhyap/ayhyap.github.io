@@ -104,16 +104,6 @@ NOTE_TYPE_END_OF_CHART = 14
 
 DURATION_OF_1_FRAME = 1 / 60
 
-# kinda hacky, smuggling constants into timing window tuples but whatevs
-TIMING_WINDOWS = {
-	CHANNEL_TAP: (12, 6, 6, 12, CHANNEL_WINDOW_TAP_SAFE, CHANNEL_WINDOW_TAP_UNSAFE),
-	CHANNEL_SNAP_FORWARD: (20, 10, 14, 20, CHANNEL_WINDOW_SNAP_FORWARD_SAFE, CHANNEL_WINDOW_SNAP_FORWARD_UNSAFE),
-	CHANNEL_SNAP_BACKWARD: (20, 14, 10, 20, CHANNEL_WINDOW_SNAP_BACKWARD_SAFE, CHANNEL_WINDOW_SNAP_BACKWARD_UNSAFE),
-	CHANNEL_SWIPE_CW: (20, 10, 10, 20, CHANNEL_WINDOW_SWIPE_CW_SAFE, CHANNEL_WINDOW_SWIPE_CW_UNSAFE),
-	CHANNEL_SWIPE_CCW: (20, 10, 10, 20, CHANNEL_WINDOW_SWIPE_CCW_SAFE, CHANNEL_WINDOW_SWIPE_CCW_UNSAFE),
-	CHANNEL_CHAIN: (8, 8, 8, 8, CHANNEL_WINDOW_CHAIN_SAFE, CHANNEL_WINDOW_CHAIN_SAFE)
-}
-
 
 class Note:
 	def __init__(self, position, size, note_type=None, channel=None, timestamp=None, index=None):
@@ -127,12 +117,6 @@ class Note:
 		assert not (timestamp is None and index is None)
 		self.timestamp = timestamp
 		self.index = index
-		if self.index is not None:
-			timing_window = TIMING_WINDOWS[self.channel]
-			self.early_window = self.index - timing_window[0]
-			self.late_window = self.index + timing_window[3]
-		else:
-			self.early_window = self.late_window = None
 
 	def __str__(self):
 		return "Note({}, {}, {}, {}, {}, {})".format(self.note_type, self.channel, self.position, self.size,
@@ -406,29 +390,22 @@ def draw(notes: list, holds: dict):
 	notes = np.array(notes, dtype="object")
 	note_indices = np.array([note.index for note in notes])
 	arange = np.arange(len(note_indices))
-	print('plotting notes')
 	for note in notes:
 		if note.note_type != NOTE_TYPE_HOLD_END:
 			plot_note(note)
 
-	print('plotting holds')
 	for hold in holds.values():
 		prev_note = None
 		for note in hold.notes:
-			print(note)
 			if prev_note is None:
 				plot_note(note)
 				prev_note = note
 			else:
 				# interpolate hold
-				print('interpolate hold')
 				if prev_note.index == note.index:
-					print('same index, skipped')
 					continue
 				indices = np.arange(prev_note.index, note.index)
-				print('index', indices)
 				if len(indices) < 2:
-					print('too fast, skipped')
 					# hold moves too fast, no need to interpolate this segment
 					continue
 
@@ -436,14 +413,10 @@ def draw(notes: list, holds: dict):
 				# just assume it's baked idk
 				interpolated_sizes = [prev_note.size for _ in indices]
 				interpolated_positions = [prev_note.position for _ in indices]
-				print(interpolated_sizes)
-				print(interpolated_positions)
-				print('draw straight hold segments')
 				for i, (position, size, index) in enumerate(zip(interpolated_positions, interpolated_sizes, indices)):
 					# skip first one, already drawn
 					if i == 0:
 						continue
-					print(i, position, size, index)
 					plot_note(Note(position, size, note_type=NOTE_TYPE_HOLD_SEGMENT, index=index))
 				prev_note = note
 	# overlapping taps/hold starts
