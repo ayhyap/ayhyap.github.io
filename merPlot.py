@@ -10,6 +10,7 @@ from js import document, FileReader
 from pprint import pprint
 from pyodide.ffi import create_proxy
 
+
 notetype2channel = {
 	0: None,
 	1: 0,  # tap
