@@ -1,1 +1,1 @@
-packages = ["pillow", "arrr"]
+packages = ["pillow", "arrr", "numpy"]
