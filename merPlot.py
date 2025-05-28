@@ -237,16 +237,31 @@ def parse_mer(lines):
 				assert measure == tick == 0, 'no starting bpm!'
 				starting_bpm = float(split[3])
 		elif line_type == LINE_TYPE_TIMESIG:
-			timing_events.append((measure, tick, 'timesig', (int(split[3]), int(split[4]))))
+			try:
+				numerator = int(split[3])
+			except IndexError:
+				# invalid line, skip
+				continue
+			try:
+				denominator = int(split[4])
+			except IndexError:
+				# no denom, assume 4
+				denominator = 4
+			timing_events.append((measure, tick, 'timesig', (numerator, denominator)))
 			_timing_event_timestamps.append(_timestamp)
 			if starting_timesig is None:
 				assert measure == tick == 0, 'no starting timesig!'
-				starting_timesig = (int(split[3]), int(split[4]))
+				starting_timesig = (numerator, denominator)
 		elif line_type == LINE_TYPE_NOTE:
 			note_lines.append(line)
 			_note_timestamps.append(_timestamp)
 		else:
 			continue
+
+	if starting_timesig is None:
+		# default to 4/4
+		timing_events.append((measure, tick, 'timesig', (4, 4)))
+		_timing_event_timestamps.append(0)
 
 	_idx = np.argsort(_timing_event_timestamps)
 	sorted_timing_events = np.array(timing_events, dtype='object')[_idx]
