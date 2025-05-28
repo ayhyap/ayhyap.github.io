@@ -214,7 +214,7 @@ def parse_mer(lines):
 	timing_events = []
 	_timing_event_timestamps = []
 	note_lines = []
-	_note_timestamps = []
+	_note_ids = []
 	for line in lines:
 		line = line.strip()
 		if line.startswith('#BODY'):
@@ -254,7 +254,7 @@ def parse_mer(lines):
 				starting_timesig = (numerator, denominator)
 		elif line_type == LINE_TYPE_NOTE:
 			note_lines.append(line)
-			_note_timestamps.append(_timestamp)
+			_note_ids.append(int(split[4]))
 		else:
 			continue
 
@@ -267,10 +267,11 @@ def parse_mer(lines):
 	sorted_timing_events = np.array(timing_events, dtype='object')[_idx]
 	conductor = Conductor(sorted_timing_events)
 
-	_idx = np.argsort(_note_timestamps)
+	_idx = np.argsort(_note_ids)
 	sorted_note_lines = np.array(note_lines, dtype='object')[_idx]
 	notes = []
 	holds = {}
+	orphaned_hold_notes = {}
 	for line in sorted_note_lines:
 		# measure	linetyp	lineno	size	next_hold_lineno
 		# 	tick	notetyp	pos		render
@@ -310,19 +311,43 @@ def parse_mer(lines):
 				assert int(split[8]) > int(split[4])
 				holds[int(split[8])] = hold
 			elif note_type == NOTE_TYPE_HOLD_SEGMENT:
-				hold = holds[int(split[4])]
-				hold.add_note(Note(position, size, note_type=NOTE_TYPE_HOLD_SEGMENT, timestamp=timestamp))
-				holds[int(split[8])] = hold
-				del holds[int(split[4])]
+				note = Note(position, size, note_type=NOTE_TYPE_HOLD_SEGMENT, timestamp=timestamp)
+				try:
+					hold = holds[int(split[4])]
+					hold.add_note(note)
+					holds[int(split[8])] = hold
+					del holds[int(split[4])]
+				except KeyError as e:
+					orphaned_hold_notes[int(split[4])] = (note, int(split[8]))
 			elif note_type == NOTE_TYPE_HOLD_END:
-				hold = holds[int(split[4])]
-				hold.add_note(Note(position, size, note_type=NOTE_TYPE_HOLD_SEGMENT, timestamp=timestamp))
+				note = Note(position, size, note_type=NOTE_TYPE_HOLD_SEGMENT, timestamp=timestamp)
+				try:
+					hold = holds[int(split[4])]
+					hold.add_note(note)
+				except KeyError as e:
+					orphaned_hold_notes[int(split[4])] = (note, None)
 				# add hold end note to note list for timing window checking
 				note = Note(position, size, note_type=NOTE_TYPE_HOLD_END, timestamp=timestamp)
 				notes.append(note)
 			else:
 				note = Note(position, size, note_type=note_type, timestamp=timestamp)
 				notes.append(note)
+	i = 0
+	while len(list(orphaned_hold_notes.keys())) > 0 or i > 1_000_000_000:
+		for id, (note, next_id) in list(orphaned_hold_notes.items()):
+			try:
+				hold = holds[id]
+				hold.add_note(note)
+				if next_id is not None:
+					holds[next_id] = hold
+					del holds[id]
+				del orphaned_hold_notes[id]
+			except KeyError:
+				continue
+		i += 1
+
+	if len(orphaned_hold_notes) > 0:
+		print('broken hold detected, some holds might not be rendered correctly')
 
 	return notes, holds
 
