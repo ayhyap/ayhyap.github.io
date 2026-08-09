@@ -405,10 +405,10 @@ def draw(notes: list, holds: dict):
 					chart[channel, index, start_pos_index:end_pos_index] += 1
 
 				if note.position < 15:
-					if note.position + note.size >= 15:
+					if note.position + note.size > 15:
 						wraparound[channel, index] += 1
 				else:
-					if note.position + note.size >= 75:
+					if note.position + note.size > 75:
 						wraparound[channel, index] += 1
 		except Exception as e:
 			print(note)
