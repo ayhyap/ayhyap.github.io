@@ -555,48 +555,46 @@ def visualize(chart, wraparound, draw_windows=False):
 	
 	# left and right boundaries
 	img = np.pad(img, ((0, 0), (1, 1), (0, 0)), constant_values=255)
+	img = np.pad(img, ((0, 0), (1, 1), (0, 0)))
 
-
-
-	
 	# add wraparound note colors in
 	
 	# hold
 	temp = np.zeros((wraparound.shape[1], 3), dtype=np.uint8)
 	temp += wraparound[CHANNEL_HOLD]
 	temp *= 128
-	img[:,0] *= (1 - wraparound[CHANNEL_HOLD])
-	img[:,0] += temp
-	img[:,-1] *= (1 - wraparound[CHANNEL_HOLD])
-	img[:,-1] += temp
+	img[:,:2] *= (1 - wraparound[CHANNEL_HOLD])
+	img[:,:2] += temp
+	img[:,-2:] *= (1 - wraparound[CHANNEL_HOLD])
+	img[:,-2:] += temp
 	
 	# hold overlapping
 	temp = np.zeros((wraparound.shape[1], 3), dtype=np.uint8)
 	temp += wraparound[CHANNEL_HOLD_OVERLAPPING]
 	temp *= 192
-	img[:,0] *= (1 - wraparound[CHANNEL_HOLD_OVERLAPPING])
-	img[:,0] += temp
-	img[:,-1] *= (1 - wraparound[CHANNEL_HOLD_OVERLAPPING])
-	img[:,-1] += temp
+	img[:,:2] *= (1 - wraparound[CHANNEL_HOLD_OVERLAPPING])
+	img[:,:2] += temp
+	img[:,-2:] *= (1 - wraparound[CHANNEL_HOLD_OVERLAPPING])
+	img[:,-2:] += temp
 	
 	# tap
 	temp = np.zeros((wraparound.shape[1], 3), dtype=np.uint8)
 	temp += wraparound[CHANNEL_TAP]
 	temp[:, 0] *= 255
 	temp[:, 2] *= 255
-	img[:,0] *= (1 - wraparound[CHANNEL_TAP])
-	img[:,0] += temp
-	img[:,-1] *= (1 - wraparound[CHANNEL_TAP])
-	img[:,-1] += temp
+	img[:,:2] *= (1 - wraparound[CHANNEL_TAP])
+	img[:,:2] += temp
+	img[:,-2:] *= (1 - wraparound[CHANNEL_TAP])
+	img[:,-2:] += temp
 	
 	# snap forward
 	temp = np.zeros((wraparound.shape[1], 3), dtype=np.uint8)
 	temp += wraparound[CHANNEL_SNAP_FORWARD]
 	temp[:, 0] *= 255
-	img[:,0] *= (1 - wraparound[CHANNEL_SNAP_FORWARD])
-	img[:,0] += temp
-	img[:,-1] *= (1 - wraparound[CHANNEL_SNAP_FORWARD])
-	img[:,-1] += temp
+	img[:,:2] *= (1 - wraparound[CHANNEL_SNAP_FORWARD])
+	img[:,:2] += temp
+	img[:,-2:] *= (1 - wraparound[CHANNEL_SNAP_FORWARD])
+	img[:,-2:] += temp
 	
 	# snap backward
 	temp = np.zeros((wraparound.shape[1], 3), dtype=np.uint8)
@@ -604,39 +602,39 @@ def visualize(chart, wraparound, draw_windows=False):
 	temp[:, 0] *= 20
 	temp[:, 1] *= 20
 	temp[:, 2] *= 255
-	img[:,0] *= (1 - wraparound[CHANNEL_SNAP_BACKWARD])
-	img[:,0] += temp
-	img[:,-1] *= (1 - wraparound[CHANNEL_SNAP_BACKWARD])
-	img[:,-1] += temp
+	img[:,:2] *= (1 - wraparound[CHANNEL_SNAP_BACKWARD])
+	img[:,:2] += temp
+	img[:,-2:] *= (1 - wraparound[CHANNEL_SNAP_BACKWARD])
+	img[:,-2:] += temp
 	
 	# snap CW (orange)
 	temp = np.zeros((wraparound.shape[1], 3), dtype=np.uint8)
 	temp += wraparound[CHANNEL_SWIPE_CW]
 	temp[:, 0] *= 255
 	temp[:, 1] *= 150
-	img[:,0] *= (1 - wraparound[CHANNEL_SWIPE_CW])
-	img[:,0] += temp
-	img[:,-1] *= (1 - wraparound[CHANNEL_SWIPE_CW])
-	img[:,-1] += temp
+	img[:,:2] *= (1 - wraparound[CHANNEL_SWIPE_CW])
+	img[:,:2] += temp
+	img[:,-2:] *= (1 - wraparound[CHANNEL_SWIPE_CW])
+	img[:,-2:] += temp
 	
 	# snap CCW (green)
 	temp = np.zeros((wraparound.shape[1], 3), dtype=np.uint8)
 	temp += wraparound[CHANNEL_SWIPE_CCW]
 	temp[:, 1] *= 200
-	img[:,0] *= (1 - wraparound[CHANNEL_SWIPE_CCW])
-	img[:,0] += temp
-	img[:,-1] *= (1 - wraparound[CHANNEL_SWIPE_CCW])
-	img[:,-1] += temp
+	img[:,:2] *= (1 - wraparound[CHANNEL_SWIPE_CCW])
+	img[:,:2] += temp
+	img[:,-2:] *= (1 - wraparound[CHANNEL_SWIPE_CCW])
+	img[:,-2:] += temp
 	
 	# chain
 	temp = np.zeros((wraparound.shape[1], 3), dtype=np.uint8)
 	temp += wraparound[CHANNEL_CHAIN]
 	temp[:, 0] *= 255
 	temp[:, 1] *= 255
-	img[:,0] *= (1 - wraparound[CHANNEL_CHAIN])
-	img[:,0] += temp
-	img[:,-1] *= (1 - wraparound[CHANNEL_CHAIN])
-	img[:,-1] += temp
+	img[:,:2] *= (1 - wraparound[CHANNEL_CHAIN])
+	img[:,:2] += temp
+	img[:,-2:] *= (1 - wraparound[CHANNEL_CHAIN])
+	img[:,-2:] += temp
 	
 	# extend chart to fill in last column
 	cols = int(len(temp) / COL_HEIGHT) + 1
@@ -649,10 +647,9 @@ def visualize(chart, wraparound, draw_windows=False):
 	imgdraw = ImageDraw.Draw(img)
 	max_time = int(chart.shape[1] / 120)
 	for i in range(max_time):
-		# imgdraw.text((183,2400-10), 'test', fill=(255,255,255))
 		col = int(i / 20)
 		row = i % 20
-		imgdraw.text((184 + col * (182 + MARGIN_WIDTH), 2390 - row * 120), str(i) + '.0')
+		imgdraw.text((186 + col * (184 + MARGIN_WIDTH), 2390 - row * 120), str(i) + '.0')
 	return img
 
 
