@@ -558,11 +558,20 @@ def visualize(chart, wraparound, draw_windows=False):
 	
 	# hold
 	temp = np.zeros((wraparound.shape[1], 3), dtype=np.uint8)
-	temp += wraparound[CHANNEL_HOLD] * 128
-	temp += wraparound[CHANNEL_HOLD_OVERLAPPING] * 64
+	temp += wraparound[CHANNEL_HOLD]
+	temp *= 128
 	img[:,0] *= (1 - wraparound[CHANNEL_HOLD])
 	img[:,0] += temp
 	img[:,-1] *= (1 - wraparound[CHANNEL_HOLD])
+	img[:,-1] += temp
+	
+	# hold overlapping
+	temp = np.zeros((wraparound.shape[1], 3), dtype=np.uint8)
+	temp += wraparound[CHANNEL_HOLD_OVERLAPPING]
+	temp *= 192
+	img[:,0] *= (1 - wraparound[CHANNEL_HOLD_OVERLAPPING])
+	img[:,0] += temp
+	img[:,-1] *= (1 - wraparound[CHANNEL_HOLD_OVERLAPPING])
 	img[:,-1] += temp
 	
 	# tap
