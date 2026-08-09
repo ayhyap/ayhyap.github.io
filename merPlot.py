@@ -479,6 +479,7 @@ def visualize(chart, wraparound, draw_windows=False):
 	# (len, 180, 3)
 	img = np.zeros((chart.shape[1], chart.shape[2], 3), dtype=np.uint8)
 	chart = chart.astype(bool).astype(np.uint8).reshape(chart.shape[0], chart.shape[1], chart.shape[2], 1)
+	wraparound = wraparound.astype(bool).astype(np.uint8).reshape(wraparound.shape[0], wraparound.shape[1], 1)
 
 	# holds
 	img += chart[CHANNEL_HOLD] * 128
