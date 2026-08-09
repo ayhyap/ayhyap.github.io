@@ -362,6 +362,8 @@ def draw(notes: list, holds: dict):
 	chart = np.zeros((21, int(np.round(chart_length) + 1), 180), dtype=np.int32)
 	chart = np.pad(chart, ((0, 0), (20, 20), (0, 0)))  # pad for timing windows
 
+	wraparound = np.zeros((21, int(np.round(chart_length) + 1)))
+
 	timestamp2index = lambda x: int(np.round(x / chart_duration * chart_length)) + 20
 	index2timestamp = lambda x: (x - 20) / chart_length * chart_duration
 
@@ -389,6 +391,7 @@ def draw(notes: list, holds: dict):
 		try:
 			if note.size == 60:
 				chart[channel, index] += 1
+				wraparound[channel, index] += 1
 			else:
 				# notes start on odd indices and end on even indices
 				start_pos_index = pos2index(note.position)
@@ -399,6 +402,13 @@ def draw(notes: list, holds: dict):
 					chart[channel, index, :end_pos_index] += 1
 				else:
 					chart[channel, index, start_pos_index:end_pos_index] += 1
+
+				if note.position < 15:
+					if note.position + note.size >= 15:
+						wraparound[channel, index] += 1
+				else:
+					if note.position + note.size >= 75:
+						wraparound[channel, index] += 1
 		except Exception as e:
 			print(note)
 			print(index)
@@ -458,11 +468,15 @@ def draw(notes: list, holds: dict):
 	# overlapping holds
 	chart[CHANNEL_HOLD_OVERLAPPING] = (chart[CHANNEL_HOLD] > 1).astype(np.int32)
 	chart[CHANNEL_HOLD] = chart[CHANNEL_HOLD].astype(bool).astype(np.int32)
+	
+	wraparound[CHANNEL_HOLD_OVERLAPPING] = (wraparound[CHANNEL_HOLD] > 1).astype(np.int32)
+	wraparound[CHANNEL_HOLD] = wraparound[CHANNEL_HOLD].astype(bool).astype(np.int32)
+	
+	return chart, wraparound
 
-	return chart
 
-
-def visualize(chart, draw_windows=False):
+def visualize(chart, wraparound, draw_windows=False):
+	# (len, 180, 3)
 	img = np.zeros((chart.shape[1], chart.shape[2], 3), dtype=np.uint8)
 	chart = chart.astype(bool).astype(np.uint8).reshape(chart.shape[0], chart.shape[1], chart.shape[2], 1)
 
@@ -495,6 +509,8 @@ def visualize(chart, draw_windows=False):
 	# snap backward
 	temp = np.zeros((chart.shape[1], chart.shape[2], 3), dtype=np.uint8)
 	temp += chart[CHANNEL_SNAP_BACKWARD]
+	temp[:, :, 0] *= 20
+	temp[:, :, 1] *= 20
 	temp[:, :, 2] *= 255
 	img *= (1 - chart[CHANNEL_SNAP_BACKWARD])
 	img += temp
@@ -503,14 +519,14 @@ def visualize(chart, draw_windows=False):
 	temp = np.zeros((chart.shape[1], chart.shape[2], 3), dtype=np.uint8)
 	temp += chart[CHANNEL_SWIPE_CW]
 	temp[:, :, 0] *= 255
-	temp[:, :, 1] *= 170
+	temp[:, :, 1] *= 150
 	img *= (1 - chart[CHANNEL_SWIPE_CW])
 	img += temp
 
 	# swipe CCW (green)
 	temp = np.zeros((chart.shape[1], chart.shape[2], 3), dtype=np.uint8)
 	temp += chart[CHANNEL_SWIPE_CCW]
-	temp[:, :, 1] *= 255
+	temp[:, :, 1] *= 200
 	img *= (1 - chart[CHANNEL_SWIPE_CCW])
 	img += temp
 
@@ -526,10 +542,92 @@ def visualize(chart, draw_windows=False):
 
 	COL_HEIGHT = 2400
 	MARGIN_WIDTH = 50
+
+	# roll from 0-15-30-45-60 to 30-45-0-15-30
+	# roll 15*3, idk it just works
 	img = np.roll(img, -45, axis=-2)
+	
+	# left and right boundaries
+	img = np.pad(img, ((0, 0), (1, 1), (0, 0)), constant_values=255)
+
+
+
+	
+	# add wraparound note colors in
+	
+	# hold
+	temp = np.zeros((wraparound.shape[1], 3), dtype=np.uint8)
+	temp += wraparound[CHANNEL_HOLD] * 128
+	temp += wraparound[CHANNEL_HOLD_OVERLAPPING] * 64
+	img[:,0] *= (1 - wraparound[CHANNEL_HOLD])
+	img[:,0] += temp
+	img[:,-1] *= (1 - wraparound[CHANNEL_HOLD])
+	img[:,-1] += temp
+	
+	# tap
+	temp = np.zeros((wraparound.shape[1], 3), dtype=np.uint8)
+	temp += wraparound[CHANNEL_TAP]
+	temp[:, 0] *= 255
+	temp[:, 2] *= 255
+	img[:,0] *= (1 - wraparound[CHANNEL_TAP])
+	img[:,0] += temp
+	img[:,-1] *= (1 - wraparound[CHANNEL_TAP])
+	img[:,-1] += temp
+	
+	# snap forward
+	temp = np.zeros((wraparound.shape[1], 3), dtype=np.uint8)
+	temp += wraparound[CHANNEL_SNAP_FORWARD]
+	temp[:, 0] *= 255
+	img[:,0] *= (1 - wraparound[CHANNEL_SNAP_FORWARD])
+	img[:,0] += temp
+	img[:,-1] *= (1 - wraparound[CHANNEL_SNAP_FORWARD])
+	img[:,-1] += temp
+	
+	# snap backward
+	temp = np.zeros((wraparound.shape[1], 3), dtype=np.uint8)
+	temp += wraparound[CHANNEL_SNAP_BACKWARD]
+	temp[:, 0] *= 20
+	temp[:, 1] *= 20
+	temp[:, 2] *= 255
+	img[:,0] *= (1 - wraparound[CHANNEL_SNAP_BACKWARD])
+	img[:,0] += temp
+	img[:,-1] *= (1 - wraparound[CHANNEL_SNAP_BACKWARD])
+	img[:,-1] += temp
+	
+	# snap CW (orange)
+	temp = np.zeros((wraparound.shape[1], 3), dtype=np.uint8)
+	temp += wraparound[CHANNEL_SWIPE_CW]
+	temp[:, 0] *= 255
+	temp[:, 1] *= 150
+	img[:,0] *= (1 - wraparound[CHANNEL_SWIPE_CW])
+	img[:,0] += temp
+	img[:,-1] *= (1 - wraparound[CHANNEL_SWIPE_CW])
+	img[:,-1] += temp
+	
+	# snap CCW (green)
+	temp = np.zeros((wraparound.shape[1], 3), dtype=np.uint8)
+	temp += wraparound[CHANNEL_SWIPE_CCW]
+	temp[:, 1] *= 200
+	img[:,0] *= (1 - wraparound[CHANNEL_SWIPE_CCW])
+	img[:,0] += temp
+	img[:,-1] *= (1 - wraparound[CHANNEL_SWIPE_CCW])
+	img[:,-1] += temp
+	
+	# chain
+	temp = np.zeros((wraparound.shape[1], 3), dtype=np.uint8)
+	temp += wraparound[CHANNEL_CHAIN]
+	temp[:, 0] *= 255
+	temp[:, 1] *= 255
+	img[:,0] *= (1 - wraparound[CHANNEL_CHAIN])
+	img[:,0] += temp
+	img[:,-1] *= (1 - wraparound[CHANNEL_CHAIN])
+	img[:,-1] += temp
+	
+	# extend chart to fill in last column
 	cols = int(len(temp) / COL_HEIGHT) + 1
 	img = np.pad(img, ((0, COL_HEIGHT * cols - len(img)), (0, 0), (0, 0)))
-	img = np.pad(img, ((0, 0), (1, 1), (0, 0)), constant_values=255)
+	
+	# split into columns and pad margin for timestamp
 	imgs = [np.pad(img[i:i + COL_HEIGHT], ((0, 0), (0, MARGIN_WIDTH), (0, 0))) for i in range(0, len(img), COL_HEIGHT)]
 	img = np.concatenate(imgs, axis=1)[::-1]
 	img = Image.fromarray(img)
@@ -554,7 +652,7 @@ def button_clicked(event):
 
 def read_complete(event):
 	content = document.getElementById("outputImage")
-	img = visualize(draw(*parse_mer(event.target.result)), draw_windows=False)
+	img = visualize(*draw(*parse_mer(event.target.result)), draw_windows=False)
 	buffer = io.BytesIO()
 	img.save(buffer, format='PNG')
 	buffer.seek(0)
