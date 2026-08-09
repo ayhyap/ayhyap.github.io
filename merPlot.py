@@ -483,8 +483,8 @@ def visualize(chart, wraparound, draw_windows=False):
 	# (c,len,180,1)
 	chart = chart.astype(bool).astype(np.uint8).reshape(chart.shape[0], chart.shape[1], chart.shape[2], 1)
 
-	# (c, len, 1)
-	wraparound = wraparound.astype(bool).astype(np.uint8).reshape(wraparound.shape[0], wraparound.shape[1], 1)
+	# (c, len, 1, 1)
+	wraparound = wraparound.astype(bool).astype(np.uint8).reshape(wraparound.shape[0], wraparound.shape[1], 1, 1)
 
 	# holds
 	img += chart[CHANNEL_HOLD] * 128
@@ -555,12 +555,12 @@ def visualize(chart, wraparound, draw_windows=False):
 	
 	# left and right boundaries
 	img = np.pad(img, ((0, 0), (1, 1), (0, 0)), constant_values=255)
-	img = np.pad(img, ((0, 0), (1, 1), (0, 0)))
+	img = np.pad(img, ((0, 0), (1, 1), (0, 0)), constant_values=0)
 
-	# add wraparound note colors in
+	# add wraparound note colors
 	
 	# hold
-	temp = np.zeros((wraparound.shape[1], 3), dtype=np.uint8)
+	temp = np.zeros((wraparound.shape[1], 1, 3), dtype=np.uint8)
 	temp += wraparound[CHANNEL_HOLD]
 	temp *= 128
 	img[:,:2] *= (1 - wraparound[CHANNEL_HOLD])
@@ -569,7 +569,7 @@ def visualize(chart, wraparound, draw_windows=False):
 	img[:,-2:] += temp
 	
 	# hold overlapping
-	temp = np.zeros((wraparound.shape[1], 3), dtype=np.uint8)
+	temp = np.zeros((wraparound.shape[1], 1, 3), dtype=np.uint8)
 	temp += wraparound[CHANNEL_HOLD_OVERLAPPING]
 	temp *= 192
 	img[:,:2] *= (1 - wraparound[CHANNEL_HOLD_OVERLAPPING])
@@ -578,7 +578,7 @@ def visualize(chart, wraparound, draw_windows=False):
 	img[:,-2:] += temp
 	
 	# tap
-	temp = np.zeros((wraparound.shape[1], 3), dtype=np.uint8)
+	temp = np.zeros((wraparound.shape[1], 1, 3), dtype=np.uint8)
 	temp += wraparound[CHANNEL_TAP]
 	temp[:, 0] *= 255
 	temp[:, 2] *= 255
@@ -588,7 +588,7 @@ def visualize(chart, wraparound, draw_windows=False):
 	img[:,-2:] += temp
 	
 	# snap forward
-	temp = np.zeros((wraparound.shape[1], 3), dtype=np.uint8)
+	temp = np.zeros((wraparound.shape[1], 1, 3), dtype=np.uint8)
 	temp += wraparound[CHANNEL_SNAP_FORWARD]
 	temp[:, 0] *= 255
 	img[:,:2] *= (1 - wraparound[CHANNEL_SNAP_FORWARD])
@@ -597,7 +597,7 @@ def visualize(chart, wraparound, draw_windows=False):
 	img[:,-2:] += temp
 	
 	# snap backward
-	temp = np.zeros((wraparound.shape[1], 3), dtype=np.uint8)
+	temp = np.zeros((wraparound.shape[1], 1, 3), dtype=np.uint8)
 	temp += wraparound[CHANNEL_SNAP_BACKWARD]
 	temp[:, 0] *= 20
 	temp[:, 1] *= 20
@@ -608,7 +608,7 @@ def visualize(chart, wraparound, draw_windows=False):
 	img[:,-2:] += temp
 	
 	# snap CW (orange)
-	temp = np.zeros((wraparound.shape[1], 3), dtype=np.uint8)
+	temp = np.zeros((wraparound.shape[1], 1, 3), dtype=np.uint8)
 	temp += wraparound[CHANNEL_SWIPE_CW]
 	temp[:, 0] *= 255
 	temp[:, 1] *= 150
@@ -618,7 +618,7 @@ def visualize(chart, wraparound, draw_windows=False):
 	img[:,-2:] += temp
 	
 	# snap CCW (green)
-	temp = np.zeros((wraparound.shape[1], 3), dtype=np.uint8)
+	temp = np.zeros((wraparound.shape[1], 1, 3), dtype=np.uint8)
 	temp += wraparound[CHANNEL_SWIPE_CCW]
 	temp[:, 1] *= 200
 	img[:,:2] *= (1 - wraparound[CHANNEL_SWIPE_CCW])
@@ -627,7 +627,7 @@ def visualize(chart, wraparound, draw_windows=False):
 	img[:,-2:] += temp
 	
 	# chain
-	temp = np.zeros((wraparound.shape[1], 3), dtype=np.uint8)
+	temp = np.zeros((wraparound.shape[1], 1, 3), dtype=np.uint8)
 	temp += wraparound[CHANNEL_CHAIN]
 	temp[:, 0] *= 255
 	temp[:, 1] *= 255
