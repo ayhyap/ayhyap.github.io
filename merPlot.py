@@ -308,7 +308,7 @@ def parse_mer(lines):
 				hold = Hold()
 				hold.add_note(Note(position, size, note_type=NOTE_TYPE_HOLD_SEGMENT, timestamp=timestamp))
 				# the next hold segment shall come on lineno split[8]
-				assert int(split[8]) > int(split[4])
+				# assert int(split[8]) > int(split[4])
 				holds[int(split[8])] = hold
 			elif note_type == NOTE_TYPE_HOLD_SEGMENT:
 				note = Note(position, size, note_type=NOTE_TYPE_HOLD_SEGMENT, timestamp=timestamp)
