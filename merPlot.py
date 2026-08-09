@@ -363,7 +363,7 @@ def draw(notes: list, holds: dict):
 	chart = np.pad(chart, ((0, 0), (20, 20), (0, 0)))  # pad for timing windows
 
 	wraparound = np.zeros((21, int(np.round(chart_length) + 1)), dtype=np.int32)
-	wraparound = np.pad(wraparound, ((0, 0), (20, 20), (0, 0)))
+	wraparound = np.pad(wraparound, ((0, 0), (20, 20)))
 
 	timestamp2index = lambda x: int(np.round(x / chart_duration * chart_length)) + 20
 	index2timestamp = lambda x: (x - 20) / chart_length * chart_duration
