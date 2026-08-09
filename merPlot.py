@@ -515,8 +515,8 @@ def visualize(chart, wraparound, draw_windows=False):
 	# snap backward
 	temp = np.zeros((chart.shape[1], chart.shape[2], 3), dtype=np.uint8)
 	temp += chart[CHANNEL_SNAP_BACKWARD]
-	temp[:, :, 0] *= 20
-	temp[:, :, 1] *= 20
+	temp[:, :, 0] *= 50
+	temp[:, :, 1] *= 50
 	temp[:, :, 2] *= 255
 	img *= (1 - chart[CHANNEL_SNAP_BACKWARD])
 	img += temp
@@ -580,8 +580,8 @@ def visualize(chart, wraparound, draw_windows=False):
 	# tap
 	temp = np.zeros((wraparound.shape[1], 1, 3), dtype=np.uint8)
 	temp += wraparound[CHANNEL_TAP]
-	temp[:, 0] *= 255
-	temp[:, 2] *= 255
+	temp[:, :, 0] *= 255
+	temp[:, :, 2] *= 255
 	img[:,:2] *= (1 - wraparound[CHANNEL_TAP])
 	img[:,:2] += temp
 	img[:,-2:] *= (1 - wraparound[CHANNEL_TAP])
@@ -590,7 +590,7 @@ def visualize(chart, wraparound, draw_windows=False):
 	# snap forward
 	temp = np.zeros((wraparound.shape[1], 1, 3), dtype=np.uint8)
 	temp += wraparound[CHANNEL_SNAP_FORWARD]
-	temp[:, 0] *= 255
+	temp[:, :, 0] *= 255
 	img[:,:2] *= (1 - wraparound[CHANNEL_SNAP_FORWARD])
 	img[:,:2] += temp
 	img[:,-2:] *= (1 - wraparound[CHANNEL_SNAP_FORWARD])
@@ -599,9 +599,9 @@ def visualize(chart, wraparound, draw_windows=False):
 	# snap backward
 	temp = np.zeros((wraparound.shape[1], 1, 3), dtype=np.uint8)
 	temp += wraparound[CHANNEL_SNAP_BACKWARD]
-	temp[:, 0] *= 20
-	temp[:, 1] *= 20
-	temp[:, 2] *= 255
+	temp[:, :, 0] *= 50
+	temp[:, :, 1] *= 50
+	temp[:, :, 2] *= 255
 	img[:,:2] *= (1 - wraparound[CHANNEL_SNAP_BACKWARD])
 	img[:,:2] += temp
 	img[:,-2:] *= (1 - wraparound[CHANNEL_SNAP_BACKWARD])
@@ -610,8 +610,8 @@ def visualize(chart, wraparound, draw_windows=False):
 	# snap CW (orange)
 	temp = np.zeros((wraparound.shape[1], 1, 3), dtype=np.uint8)
 	temp += wraparound[CHANNEL_SWIPE_CW]
-	temp[:, 0] *= 255
-	temp[:, 1] *= 150
+	temp[:, :, 0] *= 255
+	temp[:, :, 1] *= 150
 	img[:,:2] *= (1 - wraparound[CHANNEL_SWIPE_CW])
 	img[:,:2] += temp
 	img[:,-2:] *= (1 - wraparound[CHANNEL_SWIPE_CW])
@@ -620,7 +620,7 @@ def visualize(chart, wraparound, draw_windows=False):
 	# snap CCW (green)
 	temp = np.zeros((wraparound.shape[1], 1, 3), dtype=np.uint8)
 	temp += wraparound[CHANNEL_SWIPE_CCW]
-	temp[:, 1] *= 200
+	temp[:, :, 1] *= 200
 	img[:,:2] *= (1 - wraparound[CHANNEL_SWIPE_CCW])
 	img[:,:2] += temp
 	img[:,-2:] *= (1 - wraparound[CHANNEL_SWIPE_CCW])
@@ -629,8 +629,8 @@ def visualize(chart, wraparound, draw_windows=False):
 	# chain
 	temp = np.zeros((wraparound.shape[1], 1, 3), dtype=np.uint8)
 	temp += wraparound[CHANNEL_CHAIN]
-	temp[:, 0] *= 255
-	temp[:, 1] *= 255
+	temp[:, :, 0] *= 255
+	temp[:, :, 1] *= 255
 	img[:,:2] *= (1 - wraparound[CHANNEL_CHAIN])
 	img[:,:2] += temp
 	img[:,-2:] *= (1 - wraparound[CHANNEL_CHAIN])
