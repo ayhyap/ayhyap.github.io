@@ -354,9 +354,9 @@ def parse_mer(lines):
 
 def draw(notes: list, holds: dict):
 	# chart setup
-	min_timestamp = min([note.timestamp for note in notes])
+	# min_timestamp = min([note.timestamp for note in notes])
 	max_timestamp = max([note.timestamp for note in notes])
-	chart_duration = max_timestamp - min_timestamp  # s
+	chart_duration = max_timestamp # - min_timestamp  # s
 	resolution = DURATION_OF_1_FRAME / 2  # s/frame/2
 	chart_length = chart_duration / resolution  # frames*2
 	chart = np.zeros((21, int(np.round(chart_length) + 1), 180), dtype=np.int32)
@@ -371,11 +371,11 @@ def draw(notes: list, holds: dict):
 	pos2index = lambda x: 3 * x + 2
 
 	for note in notes:
-		note.timestamp -= min_timestamp
+		# note.timestamp -= min_timestamp
 		note.index = timestamp2index(note.timestamp)
 	for hold in holds.values():
 		for note in hold.notes:
-			note.timestamp -= min_timestamp
+			# note.timestamp -= min_timestamp
 			note.index = timestamp2index(note.timestamp)
 		hold.bake_notes()
 
