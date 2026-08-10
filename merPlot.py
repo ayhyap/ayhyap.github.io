@@ -649,7 +649,7 @@ def visualize(chart, wraparound, draw_windows=False):
 	img = Image.fromarray(img)
 	imgdraw = ImageDraw.Draw(img)
 	max_time = int(chart.shape[1] / 120)
-	for i in range(1, max_time):
+	for i in range(max_time+1):
 		col = int(i / 20)
 		row = i % 20
 		imgdraw.text((186 + col * (184 + MARGIN_WIDTH), 2390 - row * 120), str(i) + '.0')
