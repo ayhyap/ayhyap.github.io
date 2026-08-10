@@ -518,8 +518,7 @@ def visualize(chart, wraparound, draw_windows=False):
 	# snap backward
 	temp = np.zeros((chart.shape[1], chart.shape[2], 3), dtype=np.uint8)
 	temp += chart[CHANNEL_SNAP_BACKWARD]
-	temp[:, :, 0] *= 75
-	temp[:, :, 1] *= 75
+	temp[:, :, 1] *= 96
 	temp[:, :, 2] *= 255
 	img *= (1 - chart[CHANNEL_SNAP_BACKWARD])
 	img += temp
@@ -602,8 +601,7 @@ def visualize(chart, wraparound, draw_windows=False):
 	# snap backward
 	temp = np.zeros((wraparound.shape[1], 1, 3), dtype=np.uint8)
 	temp += wraparound[CHANNEL_SNAP_BACKWARD]
-	temp[:, :, 0] *= 75
-	temp[:, :, 1] *= 75
+	temp[:, :, 1] *= 96
 	temp[:, :, 2] *= 255
 	img[:,:2] *= (1 - wraparound[CHANNEL_SNAP_BACKWARD])
 	img[:,:2] += temp
